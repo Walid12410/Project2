@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'login.dart';
+import 'singup_async.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -16,6 +17,41 @@ class _SignupState extends State<Signup> {
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _retpyepasswordController = TextEditingController();
   TextEditingController _fullnameController = TextEditingController();
+
+  void AddUser() {
+    String password = _passwordController.text;
+    String retypepassword = _retpyepasswordController.text;
+    String fullname = _fullnameController.text;
+    String username = _usernameController.text;
+
+    if (password != retypepassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password Not Match'),
+          duration: Duration(seconds: 3),),
+      );
+    } else if (password.isEmpty || username.isEmpty || retypepassword.isEmpty
+        || fullname.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Fill all field'),
+            duration: Duration(seconds: 4),)
+      );
+    } else {
+      _callAddUser(fullname, username, password);
+    }
+  }
+  void _callAddUser(String name, String username, String password) {
+    AddUsers(name, username, password, context);
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _retpyepasswordController.dispose();
+    _fullnameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +184,9 @@ class _SignupState extends State<Signup> {
                               Color(0xff184b28),
                             ])),
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            AddUser();
+                          },
                           child: const Text(
                             'Create Account',
                             style: TextStyle(
@@ -171,14 +209,18 @@ class _SignupState extends State<Signup> {
                                   fontWeight: FontWeight.bold, color: Colors.grey),
                             ),
                             TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context)=>Login()));
+                                },
                                 child:const  Text(
                                   'Sign In',
                                   style: TextStyle(
                                       fontSize: 15,
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold),
-                                ))
+                                )
+                            )
                           ],
                         ),
                       )
