@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'signup.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:p2/home.dart';
+import 'package:p2/homepage/body.dart';
 import 'login_class.dart';
 
 
@@ -18,10 +18,12 @@ class _LoginState extends State<Login> {
   bool isObscure = true;
   TextEditingController passwordController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
+  String error = '';
 
   Future<void> _login() async {
     final username = usernameController.text;
     final password = passwordController.text;
+    bool credentialsMatch = false;
 
     final cloudUrl = 'https://webhostwebhost186.000webhostapp.com/login.php';
 
@@ -34,26 +36,30 @@ class _LoginState extends State<Login> {
           final user = User.fromJson(userJson);
 
           if (user.username == username && user.password == password) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context)=>const Home()));
-            return;
-          }else{
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Incorrect username or password'),
-                duration: Duration(seconds: 50),
-              ),
-            );
+            credentialsMatch = true;
+          } else {
+            update('Incorrect username or password');
           }
         }
-
       } else {
         throw Exception('Failed to load user data');
       }
     } catch (e) {
       print('Error: $e');
-      // Handle error, e.g., display an error message
     }
+    setState(() {
+      if (credentialsMatch) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const body()),
+        );
+      }
+    });
+  }
+  void update (String t ){
+    setState(() {
+      error = t;
+    });
   }
 
   @override
@@ -136,7 +142,16 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 20),
+                      Container(
+                        child: Column(
+                          children: [
+                            Text('$error',style: TextStyle(fontWeight: FontWeight.bold,
+                            fontSize: 15,color: Colors.red),),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30),
                       Container(
                         height: 50,
                         width: 300,
@@ -147,7 +162,9 @@ class _LoginState extends State<Login> {
                               Color(0xff184b28),
                             ])),
                         child: TextButton(
-                          onPressed:_login,
+                          onPressed:(){
+                            _login();
+                          },
                           child: const Text(
                             'SIGN IN',
                             style: TextStyle(

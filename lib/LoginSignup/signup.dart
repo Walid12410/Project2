@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login.dart';
-import 'singup_async.dart';
+import 'package:http/http.dart'as http;
+
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -12,6 +13,7 @@ class Signup extends StatefulWidget {
 class _SignupState extends State<Signup> {
   bool _isObscure = true;
   bool _isObscureConfirm = true;
+  String R = '';
 
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _usernameController = TextEditingController();
@@ -36,11 +38,9 @@ class _SignupState extends State<Signup> {
             duration: Duration(seconds: 4),)
       );
     } else {
-      _callAddUser(fullname, username, password);
+      AddUsers(_fullnameController.text.toString(), _usernameController.text.toString(),
+          _passwordController.text.toString());
     }
-  }
-  void _callAddUser(String name, String username, String password) {
-    AddUsers(name, username, password, context);
   }
 
   @override
@@ -50,6 +50,34 @@ class _SignupState extends State<Signup> {
     _fullnameController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+void update(String t){
+    setState(() {
+      R = t;
+    });
+}
+  String _baseURL = 'https://webhostwebhost186.000webhostapp.com';
+
+  Future<void> AddUsers(String name, String username, String password) async {
+    try {
+      final url = Uri.parse('$_baseURL/signup.php');
+      final response = await http.post(
+        url,
+        body: {
+          'Name': name,
+          'Username': username,
+          'Password': password,
+        },
+      );
+      if (response.statusCode == 200) {
+        update('Address added successfully');
+      } else {
+        update('Failed to add address to the database');
+      }
+    } catch (e) {
+      update('Error occurred while processing the request');
+    }
   }
 
 
@@ -173,6 +201,7 @@ class _SignupState extends State<Signup> {
                           ),
                         ),
                       ),
+                      Text('$R'),
                       const SizedBox(height: 40),
                       Container(
                         height: 50,

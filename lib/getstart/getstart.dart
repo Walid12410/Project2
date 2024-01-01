@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'content_getstart.dart';
-import 'package:p2/home.dart';
 import 'package:p2/LoginSignup/login.dart';
+
 
 class getStart extends StatefulWidget {
   const getStart({super.key});
