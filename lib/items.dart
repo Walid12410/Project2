@@ -105,13 +105,11 @@ class CartItem {
 }
 
 
-
 class ShowProducts extends StatefulWidget {
   const ShowProducts({Key? key}) : super(key: key);
 
   @override
   _ShowProductsState createState() => _ShowProductsState();
-
 }
 
 class _ShowProductsState extends State<ShowProducts> {
@@ -124,15 +122,14 @@ class _ShowProductsState extends State<ShowProducts> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-
         title: Text('Items List'),
-
       ),
-      body:
-      Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
               itemCount: _items.length,
               itemBuilder: (context, index) {
                 double itemPrice = _items[index]._price;
@@ -151,34 +148,35 @@ class _ShowProductsState extends State<ShowProducts> {
                     children: [
                       SizedBox(
                         height: 150,
-                        width:200,// Set the desired height for the item box
+                        width: 200, // Set a fixed width for the image container
                         child: Image.network(
                           _items[index]._URL,
                           fit: BoxFit.cover,
                         ),
                       ),
-                      SizedBox(height: 8),
-                      Expanded(child:
-
-                      Column(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          _items[index]._name,
-                          style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),
-
+                      SizedBox(width: 8),
+                      Flexible(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              _items[index]._name,
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              'Price: \$${itemPrice.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          'Price: \$${itemPrice.toStringAsFixed(2)}',
-                          style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold,
-                              color: Colors.blue),
-                        ),
-
-                      ],)),
-
-
-                      SizedBox(height: 8),
-                      Row(
+                      ),
+                      SizedBox(width: 8),
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
@@ -186,30 +184,28 @@ class _ShowProductsState extends State<ShowProducts> {
                               IconButton(
                                 icon: Icon(Icons.remove),
                                 onPressed: () {
-                                  if(quantities[index]>0){
+                                  if (quantities[index] > 0) {
                                     setState(() {
                                       quantities[index]--;
                                       totalPrices[index] = quantities[index] * itemPrice;
                                     });
                                   }
-                                  // Implement logic to decrease quantity
                                 },
                               ),
-                              Text('${quantities[index]}'), // Display quantity, you can replace this with actual quantity
+                              Text('${quantities[index]}'),
                               IconButton(
                                 icon: Icon(Icons.add),
                                 onPressed: () {
                                   setState(() {
                                     quantities[index]++;
                                     totalPrices[index] = quantities[index] * itemPrice;
-
                                   });
-                                }
+                                },
                               ),
                             ],
                           ),
                           Text(
-                            'Total: \$${totalPrice.toStringAsFixed(2)}', // Display the total price
+                            'Total: \$${totalPrice.toStringAsFixed(2)}',
                             style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue),
                           ),
                           IconButton(
@@ -227,7 +223,7 @@ class _ShowProductsState extends State<ShowProducts> {
                                 'itemName': newItem.name,
                                 'imageUrl': newItem.imageURL,
                                 'totalPrice': newItem.totalPrice,
-                                'quantity':newItem.quantity
+                                'quantity': newItem.quantity,
                               });
 
                               Navigator.push(
@@ -238,7 +234,6 @@ class _ShowProductsState extends State<ShowProducts> {
                               );
                             },
                           ),
-                          // Add other icons or actions as needed
                         ],
                       ),
                     ],
@@ -246,47 +241,35 @@ class _ShowProductsState extends State<ShowProducts> {
                 );
               },
             ),
-          ),
-
-          BottomAppBar(
-          color: Colors.white,
-            height: 50,
-            child:  Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.home,color: Colors.greenAccent,),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Home()));
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.shopping_cart,color: Colors.greenAccent,),
-                  onPressed: () {
-                    // Navigate to the cart page
-                    // You can replace CartPage() with your actual cart page
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => CartPage(cartItems: cartItems)),
-                    );
-                  },
-                ),
-                IconButton(
-                    icon: Icon(Icons.list,color: Colors.greenAccent,),
-                onPressed: (){
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ShowProducts()));
-                },)
-              ],
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.white,
+        height: 50,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: Icon(Icons.home, color: Colors.greenAccent),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+              },
             ),
-
-),
-
-
-        ],
+            IconButton(
+              icon: Icon(Icons.shopping_cart, color: Colors.greenAccent),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage(cartItems: cartItems)));
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.list, color: Colors.greenAccent),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ShowProducts()));
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
