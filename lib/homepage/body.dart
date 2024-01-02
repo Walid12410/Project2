@@ -4,7 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:p2/home1.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'Drinks.dart';
+import 'food.dart';
+import 'meat&chicken.dart';
+import 'MilkandChese.dart';
 
 
 class Item {
@@ -126,17 +129,20 @@ class _bodyState extends State<body> {
               const SizedBox(height: 5,),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    SpecialOffers(category: "Drinks", image: "https://images.unsplash.com/photo-1613218222876-954978a4404e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                        numOfBrands: 5, press: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> const Home()));
-                        }),
-                    SpecialOffers(category: "Food", image: "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                        numOfBrands: 12, press: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> const Home()));
-                        }),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.all(3.0),
+                  child: Row(
+                    children: [
+                      SpecialOffers(category: "Drinks", image: "https://images.unsplash.com/photo-1613218222876-954978a4404e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                          numOfBrands: 5, press: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> const Drinks()));
+                          }),
+                      SpecialOffers(category: "Food", image: "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                          numOfBrands: 12, press: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> const Food()));
+                          }),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 30,),
@@ -154,9 +160,28 @@ class _bodyState extends State<body> {
                     ),
                   ],
                 ),
-              ) // Handle null items gracefully, you can replace it with an error message or any other widget.
-
-    ],
+              ),
+              const SizedBox(height: 30,),
+              Specialforyou(text: 'Take Your Order Now', press: (){
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context)=> const Home()));
+              }),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Padding(
+                  padding: const EdgeInsets.all(3.0),
+                  child: Row(
+                    children: [
+                  ...List.generate(
+                  items!.length,
+                        (index) => product(items: items![index]),
+                  ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
           ),
         ),
       ),
@@ -231,8 +256,8 @@ class SpecialOffers extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                      Color(0xff343434).withOpacity(0.4),
-                      Color(0xff343434).withOpacity(0.15),
+                      const Color(0xff343434).withOpacity(0.4),
+                      const Color(0xff343434).withOpacity(0.15),
                     ])
                   ),
                 ),
@@ -246,7 +271,7 @@ class SpecialOffers extends StatelessWidget {
                         style: TextStyle(fontSize: 18)
                         ),
                         TextSpan(
-                          text:"$numOfBrands% off"
+                          text:"Special for you"
                         )
                       ]
                     ),
@@ -283,10 +308,44 @@ class Categories extends StatelessWidget {
        ...List.generate(categories.length, (index) => CategoryCard(
          icon: categories[index]["icon"],
          text: categories[index]["text"],
-         press: (){
-           Navigator.push(context,
-               MaterialPageRoute(builder: (context)=>const Home()));
-         }
+         press: () {
+           // Navigate to different screens based on the selected category
+           switch (categories[index]["text"]) {
+             case "chicken":
+               Navigator.push(
+                 context,
+                 MaterialPageRoute(builder: (context) =>const Meatandchicken()),
+               );
+               break;
+             case "drinks":
+               Navigator.push(
+                 context,
+                 MaterialPageRoute(builder: (context) =>const Drinks()),
+               );
+               break;
+             case "food":
+               Navigator.push(
+                 context,
+                 MaterialPageRoute(builder: (context) =>const Food()),
+               );
+               break;
+             case "meat":
+               Navigator.push(
+                 context,
+                 MaterialPageRoute(builder: (context) =>const Meatandchicken()),
+               );
+               break;
+             case "milk":
+               Navigator.push(
+                 context,
+                 MaterialPageRoute(builder: (context) =>const Milkandchese()),
+               );
+               break;
+             default:
+             // Handle the default case or add additional cases as needed
+               break;
+           }
+         },
        ))
        ],
      ),
@@ -317,7 +376,7 @@ class CategoryCard extends StatelessWidget {
             child: GestureDetector(
               onTap: press, // Call the press callback when tapped
               child: Container(
-                padding: EdgeInsets.all(15.0),
+                padding: const EdgeInsets.all(15.0),
                 decoration: BoxDecoration(
                   color: Colors.greenAccent,
                   borderRadius: BorderRadius.circular(10),
@@ -353,14 +412,14 @@ class Specialforyou extends StatelessWidget {
         children: [
           Text(
             text,
-            style: TextStyle(
+            style:const TextStyle(
               fontSize: 18,
               color: Colors.black,
             ),
           ),
           GestureDetector(
             onTap: press,
-            child: Text('see more'),
+            child: const Text('see more'),
           )
         ],
       ),

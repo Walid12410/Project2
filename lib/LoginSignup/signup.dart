@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:p2/LoginSignup/thankyoupage.dart';
 import 'login.dart';
 import 'package:http/http.dart'as http;
 
@@ -55,6 +56,7 @@ class _SignupState extends State<Signup> {
 void update(String t){
     setState(() {
       R = t;
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>const thankyoupage()));
     });
 }
   String _baseURL = 'https://webhostwebhost186.000webhostapp.com';
