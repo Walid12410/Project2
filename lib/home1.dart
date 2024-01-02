@@ -44,8 +44,9 @@ class _HomeState extends State<Home> {
             });
           }, icon: const Icon(Icons.search))
         ],
-          // title: const Text('Available Items'),
-          // centerTitle: true,
+           title: const Text('Available Items'),
+           centerTitle: true,
+          backgroundColor: Colors.greenAccent,
         ),
         // load products or progress bar
         body: _load ? const ShowProducts() : const Center(

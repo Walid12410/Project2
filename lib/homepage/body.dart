@@ -1,16 +1,82 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:p2/home1.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+
+
+class Item {
+  String ItemID;
+  String ImageURL;
+  String ItemName;
+  String Quantity;
+  String Price;
+  String CategoryID;
+  String category;
+
+  Item({
+    required this.ItemID,
+    required this.ImageURL,
+    required this.ItemName,
+    required this.Quantity,
+    required this.Price,
+    required this.CategoryID,
+    required this.category,
+  });
+
+  factory Item.fromJson(Map<String, dynamic> json) {
+    return Item(
+      ItemID: json['ItemID'],
+      ImageURL: json['ImageURL'],
+      ItemName: json['ItemName'],
+      Quantity: json['Quantity'],
+      Price: json['Price'],
+      CategoryID: json['CategoryID'],
+      category: json['category'],
+    );
+  }
+}
 
 
 class body extends StatefulWidget {
   const body({super.key});
-
   @override
   State<body> createState() => _bodyState();
 }
 
 class _bodyState extends State<body> {
+  List<Item>? items;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchItems();
+  }
+
+  Future<void> fetchItems() async {
+    try {
+      final fetchedItems = await fetchItemsFromApi();
+      setState(() {
+        items = fetchedItems;
+      });
+    } catch (e) {
+      print('Error fetching items: $e');
+    }
+  }
+
+  Future<List<Item>> fetchItemsFromApi() async {
+    final response = await http.get(Uri.parse('https://webhostwebhost186.000webhostapp.com/getItems.php'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonList = json.decode(response.body);
+      return jsonList.map((item) => Item.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load items');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +118,143 @@ class _bodyState extends State<body> {
                 ),
               ),
               Categories(),
-            ],
+              const SizedBox(height: 10),
+              Specialforyou(
+                text: "Special for you",
+                press: (){},
+              ),
+              const SizedBox(height: 5,),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    SpecialOffers(category: "Drinks", image: "https://images.unsplash.com/photo-1613218222876-954978a4404e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                        numOfBrands: 5, press: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> const Home()));
+                        }),
+                    SpecialOffers(category: "Food", image: "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                        numOfBrands: 12, press: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> const Home()));
+                        }),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 30,),
+              Specialforyou(text: 'Popular Products', press: (){}),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    ...List.generate(
+                      items!.where((item) => item.CategoryID == '5').length,
+                          (index) {
+                        final filteredItems = items!.where((item) => item.CategoryID == '5').toList();
+                        return product(items: filteredItems[index]);
+                      },
+                    ),
+                  ],
+                ),
+              ) // Handle null items gracefully, you can replace it with an error message or any other widget.
+
+    ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class product extends StatelessWidget {
+  const product({
+    super.key,
+    required this.items,
+  });
+
+  final Item items;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 140,
+      child: Column(
+        children: [
+          AspectRatio(aspectRatio: 1.02,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Image.network(items.ImageURL as String,fit: BoxFit.cover,),
+          ),),
+          Text(
+            items.ItemName,
+            style: TextStyle(color: Colors.black),
+            maxLines: 2,
+          ),
+          Text('\$${items.Price}'),
+        ],
+      ),
+    );
+  }
+}
+
+class SpecialOffers extends StatelessWidget {
+  const SpecialOffers({
+    super.key, required this.category, required this.image, required this.numOfBrands, required this.press,
+  });
+
+  final String category,image;
+  final int numOfBrands;
+  final GestureTapCallback press;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(left: 20),
+      child: SizedBox(
+        width: 250,
+        height: 100,
+        child: GestureDetector(
+         onTap: press,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Stack(
+              children: [
+                Image.network(image,
+                  fit: BoxFit.cover,
+                width: 700,
+                height: 100),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                      Color(0xff343434).withOpacity(0.4),
+                      Color(0xff343434).withOpacity(0.15),
+                    ])
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text.rich(
+                    TextSpan(
+                      style: TextStyle(color: Colors.white),
+                      children: [
+                        TextSpan(text:'$category\n',
+                        style: TextStyle(fontSize: 18)
+                        ),
+                        TextSpan(
+                          text:"$numOfBrands% off"
+                        )
+                      ]
+                    ),
+                  ),
+                ),
+
+              ],
+            ),
           ),
         ),
       ),
@@ -127,6 +329,39 @@ class CategoryCard extends StatelessWidget {
           const SizedBox(height: 5,),
           Text(text, textAlign: TextAlign.center),
           const SizedBox(height:10),
+        ],
+      ),
+    );
+  }
+}
+
+class Specialforyou extends StatelessWidget {
+  const Specialforyou({
+    Key? key,
+    required this.text,
+    required this.press,
+  }) : super(key: key);
+  final String text;
+  final GestureTapCallback press;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.black,
+            ),
+          ),
+          GestureDetector(
+            onTap: press,
+            child: Text('see more'),
+          )
         ],
       ),
     );

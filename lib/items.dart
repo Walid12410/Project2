@@ -68,10 +68,10 @@ void searchProduct(Function(String text) update, int ItemID) async {
       final jsonResponse = convert.jsonDecode(response.body);
       var row = jsonResponse[0];
       Item I = Item(
-          int.parse(row['ItemID']),
-          row['ImageURL'],
-          row['ItemName'],
-          double.parse(row['Quantity']),
+        int.parse(row['ItemID']),
+        row['ImageURL'],
+        row['ItemName'],
+        double.parse(row['Quantity']),
 
 
       );
@@ -120,10 +120,6 @@ class _ShowProductsState extends State<ShowProducts> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Items List'),
-      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
